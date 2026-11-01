@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0D51A8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="H.B.G.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+  <title>H.B.G. Sales Manager</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">H</span><div><strong>H.B.G.</strong><small>Sales Manager</small></div></div>
+    <div class="connection"><span id="connectionDot"></span><span id="connectionText">Checking…</span></div>
+  </header>
+
+  <main class="wrap">
+    <section id="setupNotice" class="notice hidden">
+      <strong>Setup required</strong>
+      <p>Add your Apps Script Web App URL and team PIN in <code>app.js</code>, then publish again.</p>
+    </section>
+
+    <section class="page-switch">
+      <div class="eyebrow">SELECT SALES PAGE</div>
+      <div class="page-buttons" id="pageButtons">
+        <button class="page-btn selected" data-page="HeinBaby">HeinBaby</button>
+        <button class="page-btn orange" data-page="BoMaLay">BoMaLay</button>
+        <button class="page-btn cyan" data-page="G2">G2</button>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Main navigation">
+      <button class="tab active" data-view="dashboard">Dashboard</button>
+      <button class="tab" data-view="neworder">New order</button>
+      <button class="tab" data-view="orders">Orders</button>
+      <button class="tab" data-view="customers">Customers</button>
+      <button class="tab" data-view="reports">Reports</button>
+    </nav>
+
+    <section id="dashboard" class="view active">
+      <div class="section-heading"><div><div class="eyebrow">OVERVIEW</div><h1>Dashboard</h1></div><button class="button secondary small" id="refreshBtn">Refresh</button></div>
+      <div class="stats">
+        <article class="stat"><span>Sales this month</span><strong id="dashSales">0 MMK</strong></article>
+        <article class="stat"><span>Orders this month</span><strong id="dashOrders">0</strong></article>
+        <article class="stat"><span>Clothes sold</span><strong id="dashQty">0</strong></article>
+        <article class="stat"><span>Unpaid amount</span><strong id="dashUnpaid">0 MMK</strong></article>
+      </div>
+      <div class="card"><div class="card-title">Recent orders</div><div id="recentOrders" class="empty">No orders loaded yet.</div></div>
+      <div class="sync-row"><span id="pendingCount">0 orders waiting to sync</span><button class="button secondary small" id="syncBtn">Sync now</button></div>
+    </section>
+
+    <section id="neworder" class="view">
+      <div class="section-heading"><div><div class="eyebrow">RECORD A SALE</div><h1>New order</h1></div></div>
+      <form id="orderForm" class="card form-card">
+        <label>Sales page <span class="required">*</span>
+          <select id="salesPage" required><option>HeinBaby</option><option>BoMaLay</option><option>G2</option></select>
+        </label>
+        <label>Order date <span class="optional">(optional — type YYYY-MM-DD)</span>
+          <input id="orderDate" type="text" inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD">
+        </label>
+        <label>Customer name <span class="required">*</span>
+          <input id="customerName" list="customerSuggestions" autocomplete="off" placeholder="Type customer name" required>
+          <datalist id="customerSuggestions"></datalist>
+        </label>
+        <label>Delivery address
+          <textarea id="address" rows="2" placeholder="Customer address"></textarea>
+        </label>
+        <div class="two-col">
+          <label>Quantity <span class="required">*</span><input id="quantity" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 5" required></label>
+          <label>Total amount (MMK) <span class="required">*</span><input id="amount" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 150000" required></label>
+        </div>
+        <div class="two-col">
+          <label>Payment status<select id="paymentStatus"><option value="Unpaid">Unpaid</option><option value="Paid">Paid</option></select></label>
+          <label>Shipping status<select id="shippingStatus"><option value="Not shipped">Not shipped</option><option value="Shipped">Shipped</option></select></label>
+        </div>
+        <div class="form-actions">
+          <button class="button primary full" id="saveOrderBtn" type="submit">Save order</button>
+          <button class="button secondary full hidden" id="cancelEditBtn" type="button">Cancel edit</button>
+        </div>
+        <p class="hint">Orders entered offline are saved on this device and sent to the shared spreadsheet when internet returns. You can edit saved orders later.</p>
+      </form>
+    </section>
+
+    <section id="orders" class="view">
+      <div class="section-heading"><div><div class="eyebrow">SALES RECORDS</div><h1>Orders</h1></div></div>
+      <div class="filters">
+        <input id="orderSearch" placeholder="Search customer or order ID">
+        <select id="pageFilter"><option value="">All pages</option><option>HeinBaby</option><option>BoMaLay</option><option>G2</option></select>
+        <select id="statusFilter"><option value="">All payment statuses</option><option>Paid</option><option>Unpaid</option></select>
+      </div>
+      <div id="ordersList" class="card list-card"><div class="empty">No orders loaded yet.</div></div>
+    </section>
+
+    <section id="customers" class="view">
+      <div class="section-heading"><div><div class="eyebrow">CUSTOMER HISTORY</div><h1>Customers</h1></div></div>
+      <input id="customerSearch" class="search-input" placeholder="Search customer name">
+      <div id="customersList" class="card list-card"><div class="empty">No customers loaded yet.</div></div>
+    </section>
+
+    <section id="reports" class="view">
+      <div class="section-heading"><div><div class="eyebrow">BUSINESS PERFORMANCE</div><h1>Reports</h1></div></div>
+      <div class="card report-controls">
+        <label>Report period<select id="reportPeriod"><option value="month">Monthly</option><option value="year">Yearly</option></select></label>
+        <label>Choose period<input id="reportDate" type="month"></label>
+      </div>
+      <div class="stats report-stats">
+        <article class="stat"><span>Total sales</span><strong id="reportSales">0 MMK</strong></article>
+        <article class="stat"><span>Orders</span><strong id="reportOrders">0</strong></article>
+        <article class="stat"><span>Quantity</span><strong id="reportQty">0</strong></article>
+        <article class="stat"><span>Paid</span><strong id="reportPaid">0 MMK</strong></article>
+      </div>
+      <div class="card"><div class="card-title">Sales by page</div><div id="pageBreakdown"></div></div>
+      <div class="card"><div class="card-title">Top customers</div><div id="topCustomers"></div></div>
+      <button class="button secondary full" id="exportBtn">Export orders as CSV</button>
+    </section>
+  </main>
+
+  <footer>H.B.G. <span>Simple sales. Clear records.</span></footer>
+  <div id="toast" role="status" class="toast"></div>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.warn));
+    }
+  </script>
+</body>
+</html>
