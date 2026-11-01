@@ -1,7 +1,7 @@
 /* H.B.G. configuration: paste your deployed Apps Script Web App URL and shared team PIN here. */
 const HBG_CONFIG = {
-  SCRIPT_URL: "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE",
-  TEAM_PIN: "CHANGE_THIS_PIN",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwgWN4vU1acaab5kKulU9xWX_D4QZvF6FYyzSsUaHl5qN4dyhp5_CGMAxezwU7G_ZNk/exec",
+  TEAM_PIN: "1221",
   CURRENCY: "MMK"
 };
 
